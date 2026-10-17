@@ -3,6 +3,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import pandas as pd
@@ -25,7 +26,7 @@ CACHE = os.environ.get("NEWSVOL_CACHE", os.path.join(ROOT, "cache"))
 
 LOG_START = dt.datetime(2026, 10, 19)            # first scored hour (UTC)
 SEALED = (dt.datetime(2026, 10, 10), dt.datetime(2026, 10, 19))  # one-shot confirmation window: never a target here
-OWN_DAYS, OTHER_DAYS = 35, 10                    # calendar days of M1 history loaded per run
+OWN_DAYS, OTHER_DAYS = 35, 5                    # calendar days of M1 history loaded per run
 MIN_VALID_RETURNS = 50
 
 
@@ -94,6 +95,9 @@ def load_m1(fetcher, pair, first_day, now, hard_end=None):
                 got_day = True
             except NotPublished:
                 pass
+            except Exception as e:  # network failure: keep what we have, data ends here
+                fetcher.log(f"  {pair} {day}: {e!r}; data ends at {data_until}")
+                break
         if not got_day:
             if d0.weekday() == 5:  # Saturday UTC: FX closed, no files to expect
                 data_until = min(d0 + dt.timedelta(days=1), stop)
@@ -101,9 +105,16 @@ def load_m1(fetcher, pair, first_day, now, hard_end=None):
                 continue
             h = d0
             while h + dt.timedelta(hours=1) <= stop:
+                if utc_to_store(h).weekday() >= 5:  # FX closed (store-clock weekend): nothing to fetch
+                    h += dt.timedelta(hours=1)
+                    data_until = h
+                    continue
                 try:
                     parts.append(fetcher.hour_ticks_m1(pair, h))
                 except NotPublished:
+                    break
+                except Exception as e:
+                    fetcher.log(f"  {pair} {h}: {e!r}; data ends at {data_until}")
                     break
                 h += dt.timedelta(hours=1)
                 data_until = h
@@ -121,12 +132,20 @@ def make_forecasts(fetcher, target_utc, now, log=print):
     events = read_events(EVENTS)
     tstore = pd.Timestamp(utc_to_store(target_utc))
     vols, ohlcs, until = {}, {}, {}
-    for p in G8:
+
+    def one(p):
+        fp = Fetcher(fetcher.cache, min_gap=fetcher.min_gap, log=log, waits=(3, 10, 20, 40), timeout=25)
         days = OWN_DAYS if p in MAJORS else OTHER_DAYS
         first = (target_utc - dt.timedelta(days=days)).date()
-        m1, du = load_m1(fetcher, p, first, now, hard_end=target_utc)
-        vols[p], ohlcs[p] = hourly_from_m1(m1)
-        until[p] = du
+        m1, du = load_m1(fp, p, first, now, hard_end=target_utc)
+        return p, m1, du, fp.n_requests, fp.n_429
+
+    with ThreadPoolExecutor(max_workers=int(os.environ.get("NEWSVOL_THREADS", "6"))) as ex:
+        for p, m1, du, nreq, n429 in ex.map(one, G8):
+            vols[p], ohlcs[p] = hourly_from_m1(m1)
+            until[p] = du
+            fetcher.n_requests += nreq
+            fetcher.n_429 += n429
     add_factor(vols)
     flags = flags_for(events, target_utc)
     out = {}
@@ -149,12 +168,12 @@ def make_forecasts(fetcher, target_utc, now, log=print):
             continue
         full = bool(np.isfinite(st["f1"]) and np.isfinite(st["f24"]))
         x = regressors(tstore, st, flags, b["years_cap"], with_factor=full)
-        lf = predict(co[(p, "FULL" if full else "NOF")], x)
+        lf = predict(co[(p, "FULL" if full else "NOF")], x) + b["d_model"]
         close = float(a["close"])
         conv = close / 1e4 / pip_size(p)
-        atr_bp = float(a["atr_bp"]) * np.exp(b["k_atr"])
+        atr_bp = float(a["atr_bp"]) * np.exp(b["k_atr"] + b["d_atr"])
         sh = same_hour_mean(v, o, tstore)
-        sh_bp = sh * np.exp(b["k_sh20"]) if np.isfinite(sh) else None
+        sh_bp = sh * np.exp(b["k_sh20"] + b["d_sh20"]) if np.isfinite(sh) else None
         own = own_events(p)
         rec.update({
             "status": "ok",

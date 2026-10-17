@@ -40,7 +40,10 @@ class Fetcher:
     """Polite sequential HTTP client with an on-disk cache. `min_gap` seconds between requests; on HTTP 429 it backs
     off (30, 60, 120, 240 s) and retries. `budget` caps the number of network requests per process (None = no cap)."""
 
-    def __init__(self, cache_dir, min_gap=0.5, budget=None, log=print, hard_end_utc=None):
+    def __init__(self, cache_dir, min_gap=0.5, budget=None, log=print, hard_end_utc=None,
+                 waits=(5, 15, 30, 60, 120, 120, 120), timeout=40):
+        self.waits = list(waits)
+        self.timeout = timeout
         self.cache = cache_dir
         self.min_gap = min_gap
         self.budget = budget
@@ -56,7 +59,7 @@ class Fetcher:
     def _get(self, rel):
         if self.budget is not None and self.n_requests >= self.budget:
             raise RuntimeError("request budget exhausted")
-        waits = [5, 15, 30, 60, 120]
+        waits = self.waits
         last_err = None
         for attempt in range(len(waits) + 1):
             gap = time.time() - self._last
@@ -67,7 +70,7 @@ class Fetcher:
             self.n_requests += 1
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": UA})
-                with urllib.request.urlopen(req, timeout=40) as r:
+                with urllib.request.urlopen(req, timeout=self.timeout) as r:
                     return r.read()
             except urllib.error.HTTPError as e:
                 if e.code == 404:

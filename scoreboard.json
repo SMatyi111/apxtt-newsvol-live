@@ -1,0 +1,25 @@
+{
+ "generated_utc": "2026-10-17T21:46:40Z",
+ "log_start_utc": "2026-10-19T00:00:00Z",
+ "first_formal_read_utc": "2026-12-14T00:00:00Z",
+ "pairs": [
+  "EURUSD",
+  "GBPUSD",
+  "USDJPY",
+  "USDCHF",
+  "AUDUSD",
+  "USDCAD",
+  "NZDUSD"
+ ],
+ "coefficients_sha256": "21663b2aedcd6ecec87a6d13f482b4c4d87adb2ae261d1a9eb035a5c8d18ced4",
+ "events_sha256": "da1da082e25f011829ac4320144098b84dc82e891328ff31be8acef7bbb65e1b",
+ "chains_ok": {
+  "forecasts": true,
+  "realized": true
+ },
+ "forecast_hours": 0,
+ "late_hours": 0,
+ "hours_without_receipt": 0,
+ "status": "waiting",
+ "last_forecasts": []
+}

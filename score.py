@@ -23,6 +23,7 @@ from newsvol.live import (FORECASTS, LOG_START, REALIZED, RECEIPTS, SCOREBOARD, 
 from newsvol.metrics import losses, nw_t  # noqa: E402
 
 READ_DATE = dt.datetime(2026, 12, 14)  # first formal evaluation: hours 2026-10-19 00:00 .. 2026-12-13 23:00 UTC
+MIN_HOURS = 600
 MODELS = {"model": "f_model_bp", "atr": "f_atr_bp", "sh20": "f_sh20_bp"}
 
 
@@ -34,6 +35,7 @@ def collect_realized(now, log=print):
     fc = read_jsonl(FORECASTS)
     have = {r["target_hour_utc"] for r in read_jsonl(REALIZED)}
     f = new_fetcher(log=log)
+    f.waits, f.timeout = [3, 10, 20, 40], 25
     added = 0
     for r in fc:
         T = parse(r["target_hour_utc"])
@@ -46,6 +48,10 @@ def collect_realized(now, log=print):
             try:
                 pairs[p] = realized_hour(f, p, T)
             except NotPublished:
+                missing = True
+                break
+            except Exception as e:  # network trouble: retry on a later run
+                log(f"  {p} {r['target_hour_utc']}: {e!r}; retry later")
                 missing = True
                 break
         if missing:
@@ -135,13 +141,30 @@ def build_scoreboard(now):
         board["release_next_hours"] = block(sc[sc["own_event_next"] == 1])
         board["per_pair"] = {p: block(sc[sc["pair"] == p]) for p in MAJORS}
         board["dm_pooled_mse_log"] = dm(sc)
-        if allb["n"]:
-            best = min(("atr", "sh20"), key=lambda k: allb[k]["mse_log"])
-            d = board["dm_pooled_mse_log"][best]
-            board["primary"] = {"best_free_baseline": best, "model_mse_log": allb["model"]["mse_log"],
-                                "baseline_mse_log": allb[best]["mse_log"], "hac_t": d["hac_t_lag24"],
-                                "pass_rule": "model MSE-log < best free baseline AND pooled HAC t > 1.96, read on hours before 2026-12-14",
-                                "provisional": now < READ_DATE}
+        def primary(s):
+            b = block(s)
+            if not b["n"]:
+                return None
+            best = min(("atr", "sh20"), key=lambda k: b[k]["mse_log"])
+            d = dm(s)[best]
+            t = d["hac_t_lag24"]
+            if b["hours"] < MIN_HOURS:
+                reading = "not enough hours yet"
+            elif b["model"]["mse_log"] >= b[best]["mse_log"]:
+                reading = "FAIL"
+            elif t is not None and np.isfinite(t) and t > 1.96:
+                reading = "PASS"
+            else:
+                reading = "INDETERMINATE"
+            return {"best_free_baseline": best, "model_mse_log": b["model"]["mse_log"], "baseline_mse_log": b[best]["mse_log"],
+                    "mse_ratio": b["model"]["mse_log"] / b[best]["mse_log"], "hac_t": t, "hours": b["hours"], "reading_if_read_now": reading}
+
+        board["primary_running"] = primary(sc)
+        if now >= READ_DATE:
+            board["formal_read"] = primary(sc[pd.to_datetime(sc["target"], format="%Y-%m-%dT%H:%M:%SZ") < READ_DATE])
+        board["pass_rule"] = ("PASS if, over scored hours 2026-10-19 00:00 .. 2026-12-13 23:00 UTC, the model's pooled MSE-log is lower "
+                              "than the best free baseline's and the pooled Diebold-Mariano HAC t (lag 24) > 1.96; FAIL if not lower; "
+                              f"else INDETERMINATE (needs >= {MIN_HOURS} scored hours)")
     recent = sorted(fc)[-24:]
     board["last_forecasts"] = []
     for t in reversed(recent):
@@ -177,8 +200,11 @@ if __name__ == "__main__":
     now = dt.datetime.fromisoformat(a.now) if a.now else utcnow()
     if not a.no_fetch:
         collect_realized(now)
+    old = json.load(open(SCOREBOARD)) if os.path.exists(SCOREBOARD) else {}
     b = build_scoreboard(now)
     b = _clean(b)
+    if {k: v for k, v in old.items() if k != "generated_utc"} == {k: v for k, v in b.items() if k != "generated_utc"}:
+        b = old  # nothing new: keep the file unchanged (no empty commits)
     with open(SCOREBOARD, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(b, fh, indent=1)
         fh.write("\n")

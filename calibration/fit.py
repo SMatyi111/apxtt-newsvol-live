@@ -23,9 +23,10 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from newsvol.features import G8, MAJORS, add_factor, asof, pip_size, state  # noqa: E402
+from newsvol.calib import frame, load_frames  # noqa: E402
+from newsvol.features import MAJORS  # noqa: E402
 from newsvol.metrics import losses, nw_t  # noqa: E402
-from newsvol.model import EVS, TERMS, TERMS_NOF, own_events  # noqa: E402
+from newsvol.model import TERMS, TERMS_NOF  # noqa: E402
 
 HARD_END = pd.Timestamp("2026-10-10")  # store clock; nothing on/after is read
 START = pd.Timestamp("2018-06-01")
@@ -40,68 +41,8 @@ ap.add_argument("--coef", default=None, help="path of the coefficient file to wr
 a = ap.parse_args()
 os.makedirs(a.out, exist_ok=True)
 
-vols, ohlcs = {}, {}
-for p in G8:
-    v = pd.read_csv(f"{a.data}/{p}_vol.csv", index_col="obs", parse_dates=True)
-    o = pd.read_csv(f"{a.data}/{p}_ohlc.csv", index_col="obs", parse_dates=True)
-    assert v.index.max() < HARD_END and o.index.max() < HARD_END
-    vols[p] = v[v.index >= START].copy()
-    ohlcs[p] = o[o.index >= pd.Timestamp("2018-05-01")]
-add_factor(vols)
+vols, ohlcs = load_frames(a.data, HARD_END)
 cal = pd.read_csv(a.calendar, parse_dates=["store_hour"])
-
-
-def frame(p, lag):
-    v, o = vols[p], ohlcs[p]
-    s, at = state(v, o)
-    T = v.index
-    D = T - pd.Timedelta(hours=lag - 1)
-    x = asof(s, D).drop(columns="state_hour")
-    x.index = T
-    atx = asof(at, D)
-    x["atr_bp"] = atx["atr_bp"].values
-    x["data_lag_h"] = ((T - pd.DatetimeIndex(atx["state_hour"])) / pd.Timedelta(hours=1)).values
-    rng = 1e4 * np.log(o["h"] / o["l"])
-    x["range_bp"] = rng.reindex(T).values
-    x["pc"] = o["c"].shift(1).reindex(T).values
-    x["pipconv"] = x["pc"] / 1e4 / pip_size(p)
-    x["rv_bp"] = v["rv_bp"]
-    sr = x["range_bp"].where(x["range_bp"] > 0)
-    srv = x["rv_bp"].where(x["rv_bp"] > 0)
-    hr = T.hour
-    for nm, ser in (("range", sr), ("rv", srv)):
-        g = ser.groupby(hr)
-        x[f"yday_{nm}"] = g.shift(1)
-        x[f"m5_{nm}"] = g.transform(lambda z: z.shift(1).rolling(5, min_periods=3).mean())
-        x[f"m20_{nm}"] = g.transform(lambda z: z.shift(1).rolling(20, min_periods=12).mean())
-    # previous store day's range (only used in the research row filter)
-    dd = o.index.normalize()
-    d = pd.DataFrame({"h": o["h"].groupby(dd).max(), "l": o["l"].groupby(dd).min()})
-    d = d[d.index.dayofweek <= 4]
-    x["prevday_range"] = (1e4 * np.log(d["h"] / d["l"])).shift(1).reindex(T.normalize()).values
-    X = pd.DataFrame(index=T)
-    X["const"] = 1.0
-    for i in range(1, 24):
-        X[f"h_{i}"] = (hr == i).astype(float)
-    for i in range(2, 6):
-        X[f"w_{i}"] = (T.dayofweek + 1 == i).astype(float)
-    for i in range(2, 13):
-        X[f"m_{i}"] = (T.month == i).astype(float)
-    X["years"] = (T - START).total_seconds() / (365.25 * 86400)
-    for k in ["c1", "c24", "c120", "lj1", "jf24", "lj24", "f1", "f24"]:
-        X[k] = x[k]
-    for k in EVS:
-        hrs = pd.DatetimeIndex(cal.loc[cal["event"] == k, "store_hour"])
-        X[f"ev_{k}"] = T.isin(hrs).astype(float)
-        X[f"ev_{k}_post"] = T.isin(hrs + pd.Timedelta(hours=1)).astype(float)
-    own = own_events(p)
-    x["ev_own"] = X[[f"ev_{k}" for k in own]].max(axis=1) if own else 0.0
-    x["ev_own_post"] = X[[f"ev_{k}_post" for k in own]].max(axis=1) if own else 0.0
-    fcols = ["atr_bp", "prevday_range", "yday_rv", "m5_rv", "m20_rv", "yday_range", "m5_range", "m20_range"]
-    ok = X[TERMS].notna().all(axis=1) & x[["l1", "l24", "l120"]].notna().all(axis=1)
-    ok &= np.isfinite(x[fcols]).all(axis=1) & (x["range_bp"] > 0) & (x["rv_bp"] > 0) & np.isfinite(x["pipconv"])
-    x["lrng"] = np.log(x["range_bp"].where(x["range_bp"] > 0))
-    return x, X[TERMS], ok
 
 
 def ols(X, y, m, terms):
@@ -112,7 +53,7 @@ def ols(X, y, m, terms):
 rows, pooled, coef_rows, rep = [], {}, [], []
 for lag in (1, 2):
     for p in MAJORS:
-        x, X, ok = frame(p, lag)
+        x, X, ok = frame(p, lag, vols, ohlcs, cal)
         y = x["lrng"]
         fit = ok & (x.index < FIT_A_END)
         tst = ok & (x.index >= FIT_A_END) & (x.index < HARD_END)

@@ -1,0 +1,81 @@
+name: hourly
+on:
+  schedule:
+    - cron: "35 * * * *"
+  workflow_dispatch:
+    inputs:
+      selftest:
+        description: "Replay the pipeline on already-seen data (2026-10-07) into log/warmup.jsonl (never scored)"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: hourly-log
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      NEWSVOL_CACHE: ${{ github.workspace }}/cache
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q -r requirements.txt
+      - name: restore raw-data cache (never committed)
+        uses: actions/cache/restore@v4
+        with:
+          path: cache
+          key: dukascopy-${{ github.run_id }}
+          restore-keys: dukascopy-
+      - name: git identity
+        run: |
+          git config user.name "apxtt-live-bot"
+          git config user.email "noreply@github.com"
+      - name: forecast (must be pushed before the target hour starts)
+        id: fc
+        run: |
+          if [ "${{ inputs.selftest }}" = "true" ]; then
+            python forecast.py --selftest | tee fc.out
+          else
+            python forecast.py | tee fc.out
+          fi
+          T=$(grep -oP '^TARGET=\K.*' fc.out || true)
+          echo "target=$T" >> "$GITHUB_OUTPUT"
+          git add log/ || true
+          if ! git diff --cached --quiet; then
+            if [ -n "$T" ]; then MSG="forecast $T"; else MSG="warm-up self-test record"; fi
+            git commit -q -m "$MSG"
+            for i in 1 2 3 4 5; do
+              if git push -q; then break; fi
+              git pull -q --rebase && sleep 2
+            done
+            git fetch -q origin main
+            if [ -n "$T" ] && git merge-base --is-ancestor HEAD origin/main; then
+              P=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+              echo "{\"target_hour_utc\":\"$T\",\"commit\":\"$(git rev-parse HEAD)\",\"pushed_utc\":\"$P\",\"run_id\":\"$GITHUB_RUN_ID\",\"note\":\"runner UTC clock read after the push returned\"}" >> log/receipts.jsonl
+            fi
+          fi
+      - name: score finished hours and rebuild the scoreboard
+        run: |
+          python score.py
+          git add log/ scoreboard.json || true
+          if ! git diff --cached --quiet; then
+            git commit -q -m "score update $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4 5; do
+              if git push -q; then break; fi
+              git pull -q --rebase && sleep 2
+            done
+          fi
+      - name: prune cache (files older than 40 days)
+        if: always()
+        run: find cache -type f -mtime +40 -delete 2>/dev/null || true
+      - name: save cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache
+          key: dukascopy-${{ github.run_id }}

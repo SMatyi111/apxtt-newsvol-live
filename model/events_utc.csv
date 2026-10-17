@@ -1,0 +1,120 @@
+# APXTT 12-event calendar for the live log (UTC release minute). Built 2026-10-17 from the macro-event-calendar skill
+# (official schedules; claims/ISM rule-based; BoJ time APPROXIMATE 11:45 JST) + SNB 2026-12-10 added by hand.
+# Frozen with the coefficients; changes only by a dated amendment and only for hours not yet forecast.
+event,utc_time,provenance,status,note
+ism,2026-09-01 14:00,rule,released,RULE-BASED: first US business day
+boc,2026-09-02 13:45,archived,released,BoC 2026 schedule press release
+claims,2026-09-03 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2026-09-04 12:30,archived,released,BLS archive file name
+ecb,2026-09-10 12:15,archived,released,GC monetary-policy meeting + ecb.mp press release; decision; press conference 14:45
+claims,2026-09-10 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ppi,2026-09-10 12:30,archived,released,BLS schedule page (archive snapshot predates it)
+cpi,2026-09-11 12:30,archived,released,BLS archive file name
+fomc,2026-09-16 18:00,archived,released,statement on scheduled meeting day; statement; press conference 14:30
+boe,2026-09-17 11:00,archived,released,BoE Monetary Policy Summary page
+claims,2026-09-17 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+boj,2026-09-18 02:45,archived,released,BoJ statement on the MPM schedule page; APPROXIMATE: statement time varies ~11:30-13:00 JST
+snb,2026-09-24 07:30,archived,released,first Thursday >= 11th with an SNB press release (quarterly assessment)
+claims,2026-09-24 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+rba,2026-09-29 04:30,archived,released,RBA decision page
+claims,2026-10-01 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2026-10-01 14:00,rule,released,RULE-BASED: first US business day
+nfp,2026-10-02 12:30,archived,released,BLS archive file name
+claims,2026-10-08 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2026-10-15 12:30,rule,released,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ppi,2026-10-15 12:30,archived,scheduled,BLS schedule page
+claims,2026-10-22 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+boc,2026-10-28 13:45,archived,scheduled,BoC 2026 schedule press release
+fomc,2026-10-28 18:00,archived,scheduled,Fed meeting calendar; statement; press conference 14:30
+claims,2026-10-29 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ecb,2026-10-29 13:15,archived,scheduled,GC meeting calendar; decision; press conference 14:45
+boj,2026-10-30 02:45,archived,scheduled,BoJ MPM schedule (statement not yet out); APPROXIMATE: statement time varies ~11:30-13:00 JST
+ism,2026-11-02 15:00,rule,scheduled,RULE-BASED: first US business day
+rba,2026-11-03 03:30,archived,scheduled,RBA board meeting schedule
+boe,2026-11-05 12:00,archived,scheduled,BoE page
+claims,2026-11-05 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2026-11-06 13:30,archived,scheduled,BLS schedule page
+cpi,2026-11-10 13:30,archived,scheduled,BLS schedule page
+claims,2026-11-12 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ppi,2026-11-13 13:30,archived,scheduled,BLS schedule page
+claims,2026-11-19 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2026-11-25 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2026-12-01 15:00,rule,scheduled,RULE-BASED: first US business day
+claims,2026-12-03 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2026-12-04 13:30,archived,scheduled,BLS schedule page
+rba,2026-12-08 03:30,archived,scheduled,RBA board meeting schedule
+boc,2026-12-09 14:45,archived,scheduled,BoC 2026 schedule press release
+fomc,2026-12-09 19:00,archived,scheduled,Fed meeting calendar; statement; press conference 14:30
+snb,2026-12-10 08:30,web,scheduled,"added 2026-10-17: SNB Dec 2026 assessment 09:30 Zurich (financecalendar.com, mnimarkets.com; not on snb.ch fetch)"
+claims,2026-12-10 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+cpi,2026-12-10 13:30,archived,scheduled,BLS schedule page
+ppi,2026-12-15 13:30,archived,scheduled,BLS schedule page
+boe,2026-12-17 12:00,archived,scheduled,BoE page
+ecb,2026-12-17 13:15,archived,scheduled,GC meeting calendar; decision; press conference 14:45
+claims,2026-12-17 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+boj,2026-12-18 02:45,archived,scheduled,BoJ MPM schedule (statement not yet out); APPROXIMATE: statement time varies ~11:30-13:00 JST
+claims,2026-12-24 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2026-12-31 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2027-01-04 15:00,rule,scheduled,RULE-BASED: first US business day
+claims,2027-01-07 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2027-01-08 13:30,archived,scheduled,BLS schedule page
+cpi,2027-01-13 13:30,archived,scheduled,BLS schedule page
+claims,2027-01-14 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2027-01-21 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+boj,2027-01-22 02:45,archived,scheduled,BoJ MPM schedule (statement not yet out); APPROXIMATE: statement time varies ~11:30-13:00 JST
+boc,2027-01-27 14:45,archived,scheduled,BoC 2027 schedule press release
+fomc,2027-01-27 19:00,archived,scheduled,Fed meeting calendar; statement; press conference 14:30
+claims,2027-01-28 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2027-02-01 15:00,rule,scheduled,RULE-BASED: first US business day
+ecb,2027-02-04 13:15,archived,scheduled,GC meeting calendar; decision; press conference 14:45
+claims,2027-02-04 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2027-02-05 13:30,archived,scheduled,BLS schedule page
+rba,2027-02-09 03:30,archived,scheduled,RBA board meeting schedule
+claims,2027-02-11 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+cpi,2027-02-11 13:30,archived,scheduled,BLS schedule page
+claims,2027-02-18 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2027-02-25 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2027-03-01 15:00,rule,scheduled,RULE-BASED: first US business day
+boc,2027-03-03 14:45,archived,scheduled,BoC 2027 schedule press release
+claims,2027-03-04 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2027-03-05 13:30,archived,scheduled,BLS schedule page
+cpi,2027-03-10 13:30,archived,scheduled,BLS schedule page
+claims,2027-03-11 13:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+fomc,2027-03-17 18:00,archived,scheduled,Fed meeting calendar; statement; press conference 14:30
+boj,2027-03-18 02:45,archived,scheduled,BoJ MPM schedule (statement not yet out); APPROXIMATE: statement time varies ~11:30-13:00 JST
+claims,2027-03-18 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ecb,2027-03-18 13:15,archived,scheduled,GC meeting calendar; decision; press conference 14:45
+rba,2027-03-23 03:30,archived,scheduled,RBA board meeting schedule
+claims,2027-03-25 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2027-04-01 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2027-04-01 14:00,rule,scheduled,RULE-BASED: first US business day
+nfp,2027-04-02 12:30,archived,scheduled,BLS schedule page
+claims,2027-04-08 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+cpi,2027-04-13 12:30,archived,scheduled,BLS schedule page
+claims,2027-04-15 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2027-04-22 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+boj,2027-04-28 02:45,archived,scheduled,BoJ MPM schedule (statement not yet out); APPROXIMATE: statement time varies ~11:30-13:00 JST
+boc,2027-04-28 13:45,archived,scheduled,BoC 2027 schedule press release
+fomc,2027-04-28 18:00,archived,scheduled,Fed meeting calendar; statement; press conference 14:30
+ecb,2027-04-29 12:15,archived,scheduled,GC meeting calendar; decision; press conference 14:45
+claims,2027-04-29 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2027-05-03 14:00,rule,scheduled,RULE-BASED: first US business day
+rba,2027-05-04 04:30,archived,scheduled,RBA board meeting schedule
+claims,2027-05-06 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2027-05-07 12:30,archived,scheduled,BLS schedule page
+cpi,2027-05-12 12:30,archived,scheduled,BLS schedule page
+claims,2027-05-13 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2027-05-20 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+claims,2027-05-27 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+ism,2027-06-01 14:00,rule,scheduled,RULE-BASED: first US business day
+boc,2027-06-02 13:45,archived,scheduled,BoC 2027 schedule press release
+claims,2027-06-03 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+nfp,2027-06-04 12:30,archived,scheduled,BLS schedule page
+fomc,2027-06-09 18:00,archived,scheduled,Fed meeting calendar; statement; press conference 14:30
+ecb,2027-06-10 12:15,archived,scheduled,GC meeting calendar; decision; press conference 14:45
+claims,2027-06-10 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+cpi,2027-06-10 12:30,archived,scheduled,BLS schedule page
+boj,2027-06-11 02:45,archived,scheduled,BoJ MPM schedule (statement not yet out); APPROXIMATE: statement time varies ~11:30-13:00 JST
+claims,2027-06-17 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
+rba,2027-06-22 04:30,archived,scheduled,RBA board meeting schedule
+claims,2027-06-24 12:30,rule,scheduled,"RULE-BASED: Thursday, Wednesday if Thursday is a US federal holiday"
