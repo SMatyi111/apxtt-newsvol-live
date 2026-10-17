@@ -31,6 +31,15 @@ if a.selftest:
     target = asof.replace(minute=0, second=0, microsecond=0) + dt.timedelta(hours=1)
     f = new_fetcher()
     res = make_forecasts(f, target, asof)
+    # also exercise the scorer's realised-range path on this already-seen hour
+    from newsvol.live import realized_hour  # noqa: E402
+    from newsvol.features import MAJORS  # noqa: E402
+    res["realized_check"] = {}
+    for p in MAJORS:
+        try:
+            res["realized_check"][p] = realized_hour(f, p, target)
+        except Exception as e:  # noqa: BLE001
+            res["realized_check"][p] = {"error": repr(e)}
     rec = {"mode": "warmup-selftest", "scored": False, "note": "replay on already-seen data; never scored",
            "run_utc": iso(now), "asof_utc": iso(asof), "target_hour_utc": iso(target), **frozen_hashes(),
            "requests": f.n_requests, "http_429": f.n_429, **res}
