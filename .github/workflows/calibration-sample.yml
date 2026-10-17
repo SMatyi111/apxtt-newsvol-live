@@ -1,0 +1,38 @@
+name: calibration-sample
+# One-off: Dukascopy BID M1 for the already-seen window used to check/adjust the frozen model on this feed.
+# Only derived hourly inputs leave the runner (as a short-lived artifact); raw files are never committed.
+on:
+  workflow_dispatch:
+    inputs:
+      start_major: {default: "2026-07-01"}
+      start_other: {default: "2026-07-27"}
+      end: {default: "2026-10-09"}
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        pair: [EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD, AUDCAD, AUDCHF, AUDJPY, AUDNZD, CADCHF, CADJPY, CHFJPY,
+               EURAUD, EURCAD, EURCHF, EURGBP, EURJPY, EURNZD, GBPAUD, GBPCAD, GBPCHF, GBPJPY, GBPNZD, NZDCAD, NZDCHF, NZDJPY]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas
+      - name: fetch
+        run: |
+          case "${{ matrix.pair }}" in EURUSD|GBPUSD|USDJPY|USDCHF|AUDUSD|USDCAD|NZDUSD) S="${{ inputs.start_major }}";; *) S="${{ inputs.start_other }}";; esac
+          python calibration/fetch_history.py --cache cache --out frames --pairs ${{ matrix.pair }} --start $S --end ${{ inputs.end }} --gap 0.5
+      - name: tick-vs-candle check
+        if: matrix.pair == 'EURUSD' || matrix.pair == 'USDJPY'
+        run: python calibration/check_ticks.py cache ${{ matrix.pair }} 2026-09-02 7 12 13 14 20 || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frames-${{ matrix.pair }}
+          path: frames/
+          retention-days: 3

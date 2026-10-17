@@ -56,7 +56,7 @@ class Fetcher:
     def _get(self, rel):
         if self.budget is not None and self.n_requests >= self.budget:
             raise RuntimeError("request budget exhausted")
-        waits = [30, 60, 120, 240]
+        waits = [5, 15, 30, 60, 120]
         last_err = None
         for attempt in range(len(waits) + 1):
             gap = time.time() - self._last
