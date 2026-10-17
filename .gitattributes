@@ -1,0 +1,2 @@
+* text=auto eol=lf
+*.md *.py *.json *.jsonl *.csv *.yml *.toml *.txt *.sha256 text eol=lf

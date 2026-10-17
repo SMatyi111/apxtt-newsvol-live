@@ -1,0 +1,19 @@
+name: probe-datafeed
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: probe
+        run: |
+          for d in 01 02 03 04 07 08 09 10 11 14 15 16 17 18 21 22 23 24 25 28 29 30; do
+            curl -sS -m 40 -o f.bi5 -w "$(date -u +%T) day $d %{http_code} %{size_download} %{remote_ip} %{time_total}\n" -A "apxtt-newsvol-live/1.0" https://datafeed.dukascopy.com/datafeed/EURUSD/2026/08/$d/BID_candles_min_1.bi5 || true
+            sleep 1
+          done
+          for h in 10 11 12 13 14 15 16 17; do
+            curl -sS -m 40 -o f.bi5 -w "$(date -u +%T) tick $h %{http_code} %{size_download} %{time_total}\n" -A "apxtt-newsvol-live/1.0" https://datafeed.dukascopy.com/datafeed/GBPUSD/2026/08/22/${h}h_ticks.bi5 || true
+            sleep 1
+          done
