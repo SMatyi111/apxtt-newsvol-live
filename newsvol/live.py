@@ -134,13 +134,13 @@ def make_forecasts(fetcher, target_utc, now, log=print):
     vols, ohlcs, until = {}, {}, {}
 
     def one(p):
-        fp = Fetcher(fetcher.cache, min_gap=fetcher.min_gap, log=log, waits=(3, 10, 20, 40), timeout=25)
+        fp = Fetcher(fetcher.cache, min_gap=fetcher.min_gap, log=log, waits=(3, 10, 20, 40, 60), timeout=25)
         days = OWN_DAYS if p in MAJORS else OTHER_DAYS
         first = (target_utc - dt.timedelta(days=days)).date()
         m1, du = load_m1(fp, p, first, now, hard_end=target_utc)
         return p, m1, du, fp.n_requests, fp.n_429
 
-    with ThreadPoolExecutor(max_workers=int(os.environ.get("NEWSVOL_THREADS", "6"))) as ex:
+    with ThreadPoolExecutor(max_workers=int(os.environ.get("NEWSVOL_THREADS", "4"))) as ex:
         for p, m1, du, nreq, n429 in ex.map(one, G8):
             vols[p], ohlcs[p] = hourly_from_m1(m1)
             until[p] = du
@@ -148,6 +148,7 @@ def make_forecasts(fetcher, target_utc, now, log=print):
             fetcher.n_429 += n429
     add_factor(vols)
     flags = flags_for(events, target_utc)
+    others_until = sorted(until[q] for q in G8 if q not in MAJORS)
     out = {}
     for p in MAJORS:
         b = co[(p, "BASE")]
@@ -189,10 +190,12 @@ def make_forecasts(fetcher, target_utc, now, log=print):
             "features_lag_hours": int(round((target_utc - until[p]).total_seconds() / 3600)) + 1,
             "own_event_hour": int(any(flags[f"ev_{k}"] for k in own)),
             "own_event_next_hour": int(any(flags[f"ev_{k}_post"] for k in own)),
+            "factor_pairs_up_to_date": int(sum(1 for q in G8 if q != p and until[q] >= until[p])),
         })
         out[p] = rec
     active = [k for k, val in flags.items() if val]
-    return {"pairs": out, "events": active, "store_hour": tstore.strftime("%Y-%m-%d %H:%M")}
+    return {"pairs": out, "events": active, "store_hour": tstore.strftime("%Y-%m-%d %H:%M"),
+            "inputs_until_utc": {q: iso(until[q]) for q in G8}}
 
 
 def realized_hour(fetcher, pair, target_utc):
