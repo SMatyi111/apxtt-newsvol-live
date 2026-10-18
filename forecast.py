@@ -69,6 +69,12 @@ if any(r["target_hour_utc"] == iso(target) for r in read_jsonl(FORECASTS)):
 f = new_fetcher()
 res = make_forecasts(f, target, now)
 done = utcnow()
+lags = [v.get("features_lag_hours") for v in res["pairs"].values()]
+if done.minute < 45 and done < target and any(l is None or l > 2 for l in lags):
+    # Amendment A0: an early run logs only with the freshest data (newest complete hour = the one before the current
+    # hour, for every major); otherwise a later run of the same hour (minute 35 / 50) tries again.
+    print(f"not logged: data not fresh yet at {iso(done)} (lags {lags}); a later run will retry")
+    sys.exit(0)
 if done >= target:
     print(f"computation finished after the hour started ({iso(done)}); still logged, will be marked late")
 rec = {"mode": "live", "target_hour_utc": iso(target), "created_utc": iso(done), "run_started_utc": iso(now),

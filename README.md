@@ -4,7 +4,7 @@ An hourly, public, preregistered test of one forecast: **how big will the next h
 (EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD), compared with two free tools a trader already has:
 ATR(14) on the hourly chart and the 20-day average range of the same hour.
 
-- Every hour, a GitHub Action (`.github/workflows/hourly.yml`, minute ~35) commits the forecasts for the **next** hour
+- Every hour, a GitHub Action (`.github/workflows/hourly.yml`, minutes 15 / 35 / 50; see AMENDMENTS.md A0) commits the forecasts for the **next** hour
   to `log/forecasts.jsonl` **before that hour starts**.
 - After the hour, a later run adds the actual range (Dukascopy BID prices) to `log/realized.jsonl` and rebuilds
   `scoreboard.json`, which the website reads: <https://smatyi111.github.io/apextradingtools/news-volatility.html#live>
