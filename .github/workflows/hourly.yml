@@ -2,6 +2,7 @@ name: hourly
 on:
   schedule:
     - cron: "35 * * * *"
+    - cron: "5 * * * *"
   workflow_dispatch:
     inputs:
       selftest:
