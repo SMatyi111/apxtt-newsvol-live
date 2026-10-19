@@ -3,3 +3,6 @@ _scratch/
 __pycache__/
 *.pyc
 calibration/data/
+
+# A1: backup trigger log (local, never committed)
+ops/logs/

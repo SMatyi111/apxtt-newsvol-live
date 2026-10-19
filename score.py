@@ -18,7 +18,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from newsvol.dukascopy import NotPublished  # noqa: E402
 from newsvol.features import MAJORS  # noqa: E402
-from newsvol.live import (FORECASTS, LOG_START, REALIZED, RECEIPTS, SCOREBOARD, SEALED, append_chained, frozen_hashes,  # noqa: E402
+from newsvol.live import (FORECASTS, LOG_START, LogCorrupt, REALIZED, RECEIPTS, SCOREBOARD, SEALED, append_chained, frozen_hashes,  # noqa: E402
                           iso, new_fetcher, read_jsonl, realized_hour, utcnow, verify_chain)
 from newsvol.metrics import losses, nw_t  # noqa: E402
 
@@ -176,6 +176,7 @@ def build_scoreboard(now):
                           "sh20": r["pairs"].get(p, {}).get("f_sh20_pips"),
                           "actual": (z.get("pairs", {}).get(p, {}) or {}).get("range_pips") if z else None}
                       for p in MAJORS}})
+    board = _clean(board)  # A1: NaN/inf (e.g. the HAC t with < 10 scored hours) -> null; this crashed every run
     with open(SCOREBOARD, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(board, fh, indent=1, sort_keys=False, allow_nan=False, default=lambda o: None)
         fh.write("\n")
@@ -198,9 +199,21 @@ if __name__ == "__main__":
     ap.add_argument("--no-fetch", action="store_true")
     a = ap.parse_args()
     now = dt.datetime.fromisoformat(a.now) if a.now else utcnow()
+    # A1 preflight: every log line must be a valid JSON object and both chains intact; otherwise stop loudly
+    # (exit 3) and write nothing. Past lines are never dropped, rewritten or repaired by this script.
+    try:
+        for path in (FORECASTS, REALIZED, RECEIPTS):
+            read_jsonl(path)
+        for path in (FORECASTS, REALIZED):
+            ok, bad = verify_chain(path)
+            if not ok:
+                raise LogCorrupt(f"{path}: hash chain broken at record {bad}")
+        old = json.load(open(SCOREBOARD, encoding="utf-8")) if os.path.exists(SCOREBOARD) else {}
+    except (LogCorrupt, json.JSONDecodeError) as e:
+        print(f"LOG CORRUPT, nothing written: {e}", file=sys.stderr)
+        sys.exit(3)
     if not a.no_fetch:
         collect_realized(now)
-    old = json.load(open(SCOREBOARD)) if os.path.exists(SCOREBOARD) else {}
     b = build_scoreboard(now)
     b = _clean(b)
     if {k: v for k, v in old.items() if k != "generated_utc"} == {k: v for k, v in b.items() if k != "generated_utc"}:

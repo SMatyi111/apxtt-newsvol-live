@@ -4,6 +4,8 @@ on:
     - cron: "15 * * * *"
     - cron: "35 * * * *"
     - cron: "50 * * * *"
+  # Also dispatched from the owner's PC at minutes 20 and 45 as a backup for skipped GitHub schedules
+  # (ops/trigger_hourly.ps1, AMENDMENTS.md A1). All computation and commits still happen here.
   workflow_dispatch:
     inputs:
       selftest:
@@ -12,6 +14,8 @@ on:
         default: false
 permissions:
   contents: write
+# One run at a time; a queued run waits (never cancels a running one). GitHub keeps at most one queued run per
+# group, so a newer queued run replaces an older queued one: harmless, every run does the same idempotent work.
 concurrency:
   group: hourly-log
   cancel-in-progress: false
@@ -22,8 +26,16 @@ jobs:
     env:
       NEWSVOL_CACHE: ${{ github.workspace }}/cache
       PYTHONUNBUFFERED: "1"
+    defaults:
+      run:
+        shell: bash
     steps:
+      # A1: check out the CURRENT tip of main, not the commit that was current when the run was queued. A run that
+      # waited in the concurrency queue used to start from a stale commit and re-forecast an hour already logged.
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
@@ -33,45 +45,47 @@ jobs:
           path: cache
           key: dukascopy-${{ github.run_id }}
           restore-keys: dukascopy-
-      - name: git identity
+      - name: git identity and sync to origin/main
         run: |
           git config user.name "apxtt-live-bot"
           git config user.email "noreply@github.com"
+          git fetch -q origin main
+          git reset -q --hard origin/main
+          echo "starting from $(git rev-parse HEAD)"
+          python ops/check_logs.py --base origin/main
       - name: forecast (must be pushed before the target hour starts)
         id: fc
         run: |
+          MSG="$RUNNER_TEMP/fc_msg"
           if [ "${{ inputs.selftest }}" = "true" ]; then
-            python forecast.py --selftest | tee fc.out
-          else
-            python forecast.py | tee fc.out
+            python forecast.py --selftest
+            echo "warm-up self-test record" > "$MSG"
+            bash ops/commit_push.sh "$MSG" ": > '$MSG'" log/warmup.jsonl
+            exit 0
           fi
-          T=$(grep -oP '^TARGET=\K.*' fc.out || true)
+          bash ops/run_forecast.sh "$MSG"
+          if [ ! -s "$MSG" ]; then echo "no forecast logged by this run"; exit 0; fi
+          bash ops/commit_push.sh "$MSG" "bash ops/run_forecast.sh '$MSG'" log/forecasts.jsonl | tee "$RUNNER_TEMP/push.out"
+          SHA=$(grep -oP '^PUSHED=\K.*' "$RUNNER_TEMP/push.out" || true)
+          P=$(grep -oP '^PUSHED_UTC=\K.*' "$RUNNER_TEMP/push.out" || true)
+          if [ -z "$SHA" ] || [ ! -s "$MSG" ]; then echo "no forecast of this run reached origin/main; no receipt"; exit 0; fi
+          T=$(sed 's/^forecast //' "$MSG")
           echo "target=$T" >> "$GITHUB_OUTPUT"
-          git add log/ || true
-          if ! git diff --cached --quiet; then
-            if [ -n "$T" ]; then MSG="forecast $T"; else MSG="warm-up self-test record"; fi
-            git commit -q -m "$MSG"
-            for i in 1 2 3 4 5; do
-              if git push -q; then break; fi
-              git pull -q --rebase && sleep 2
-            done
-            git fetch -q origin main
-            if [ -n "$T" ] && git merge-base --is-ancestor HEAD origin/main; then
-              P=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-              echo "{\"target_hour_utc\":\"$T\",\"commit\":\"$(git rev-parse HEAD)\",\"pushed_utc\":\"$P\",\"run_id\":\"$GITHUB_RUN_ID\",\"note\":\"runner UTC clock read after the push returned\"}" >> log/receipts.jsonl
-            fi
-          fi
+          # the receipt is committed and pushed right away (before A1 it waited for the score step and was lost
+          # whenever that step failed)
+          echo "receipt $T" > "$RUNNER_TEMP/rc_msg"
+          RC="python ops/append_receipt.py '$T' '$SHA' '$P' '$GITHUB_RUN_ID'"
+          bash -c "$RC"
+          bash ops/commit_push.sh "$RUNNER_TEMP/rc_msg" "$RC" log/receipts.jsonl
       - name: score finished hours and rebuild the scoreboard
+        if: ${{ !cancelled() }}
         run: |
+          git rebase --abort >/dev/null 2>&1 || true
+          git fetch -q origin main
+          git reset -q --hard origin/main
+          echo "score update $(date -u +%Y-%m-%dT%H:%MZ)" > "$RUNNER_TEMP/sc_msg"
           python score.py
-          git add log/ scoreboard.json || true
-          if ! git diff --cached --quiet; then
-            git commit -q -m "score update $(date -u +%Y-%m-%dT%H:%MZ)"
-            for i in 1 2 3 4 5; do
-              if git push -q; then break; fi
-              git pull -q --rebase && sleep 2
-            done
-          fi
+          bash ops/commit_push.sh "$RUNNER_TEMP/sc_msg" "python score.py" log/ scoreboard.json
       - name: prune cache (files older than 40 days)
         if: always()
         run: find cache -type f -mtime +40 -delete 2>/dev/null || true

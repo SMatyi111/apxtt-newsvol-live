@@ -39,11 +39,27 @@ def iso(t):
 
 
 # ---------------------------------------------------------------------------------------------------- logs
+class LogCorrupt(RuntimeError):
+    """A log line is not a valid JSON object (e.g. git conflict markers or a partial write), or a chain is broken.
+    Never repaired automatically: the caller stops without writing anything (AMENDMENTS.md A1)."""
+
+
 def read_jsonl(path):
     if not os.path.exists(path):
         return []
+    out = []
     with open(path, encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for i, line in enumerate(f, 1):
+            if not line.strip():
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError as e:
+                raise LogCorrupt(f"{path} line {i} is not valid JSON ({e.msg}): {line[:80]!r}") from None
+            if not isinstance(rec, dict):
+                raise LogCorrupt(f"{path} line {i} is not a JSON object: {line[:80]!r}")
+            out.append(rec)
+    return out
 
 
 def canon(rec):
@@ -52,8 +68,17 @@ def canon(rec):
 
 def append_chained(path, rec):
     """Append rec with prev_hash (hash of the previous line's record) and hash = sha256 of the canonical record
-    without the 'hash' field. Returns the stored record."""
-    prev = read_jsonl(path)
+    without the 'hash' field. Returns the stored record. Refuses to append to a corrupt file, a file whose last
+    line is unterminated, or a broken chain (raises LogCorrupt; nothing is written)."""
+    prev = read_jsonl(path)  # raises LogCorrupt on any bad line
+    ok, bad = verify_chain(path)
+    if not ok:
+        raise LogCorrupt(f"{path}: hash chain broken at record {bad}; refusing to append")
+    if prev:
+        with open(path, "rb") as fh:
+            fh.seek(-1, os.SEEK_END)
+            if fh.read(1) != b"\n":
+                raise LogCorrupt(f"{path}: last line has no newline (partial write?); refusing to append")
     rec = dict(rec)
     rec["prev_hash"] = prev[-1]["hash"] if prev else "0" * 64
     rec.pop("hash", None)
