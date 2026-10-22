@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
       NEWSVOL_CACHE: ${{ github.workspace }}/cache
@@ -32,15 +32,15 @@ jobs:
     steps:
       # A1: check out the CURRENT tip of main, not the commit that was current when the run was queued. A run that
       # waited in the concurrency queue used to start from a stale commit and re-forecast an hour already logged.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
       - run: pip install -q -r requirements.txt
       - name: restore raw-data cache (never committed)
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: cache
           key: dukascopy-${{ github.run_id }}
@@ -91,7 +91,7 @@ jobs:
         run: find cache -type f -mtime +40 -delete 2>/dev/null || true
       - name: save cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: cache
           key: dukascopy-${{ github.run_id }}

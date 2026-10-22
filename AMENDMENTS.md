@@ -58,3 +58,11 @@ rule (pushed before the hour starts) and everything in PREREGISTRATION.md are un
    `apxtt-newsvol-trigger`, `ops/trigger_hourly.ps1`, `ops/install_trigger_task.ps1`). It only starts a GitHub run;
    all computation and every commit still happen on GitHub's runner, under the same rules. It runs only while the
    owner is logged on, so it reduces but does not remove the risk of skipped hours.
+
+## A2 (2026-10-22; operational, not a rule change)
+
+GitHub warned that `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19 and that the Node 20 actions are being forced
+onto Node 24. To keep the runner from changing under the live log, both workflows now pin `runs-on: ubuntu-24.04`,
+and the actions move to their Node 24 majors: checkout v5, setup-python v6 (Python stays 3.12), cache restore/save v5,
+upload-artifact v6. The model, frozen files, scoring, timing rule and PASS/FAIL rules are unchanged. A cache miss
+only means the raw Dukascopy files are fetched again.

@@ -11,7 +11,7 @@ permissions:
   contents: read
 jobs:
   fetch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -20,8 +20,8 @@ jobs:
         pair: [EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD, AUDCAD, AUDCHF, AUDJPY, AUDNZD, CADCHF, CADJPY, CHFJPY,
                EURAUD, EURCAD, EURCHF, EURGBP, EURJPY, EURNZD, GBPAUD, GBPCAD, GBPCHF, GBPJPY, GBPNZD, NZDCAD, NZDCHF, NZDJPY]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
       - run: pip install -q numpy pandas
       - name: fetch
@@ -31,7 +31,7 @@ jobs:
       - name: tick-vs-candle check
         if: matrix.pair == 'EURUSD' || matrix.pair == 'USDJPY'
         run: python calibration/check_ticks.py cache ${{ matrix.pair }} 2026-09-02 7 12 13 14 20 || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: frames-${{ matrix.pair }}
           path: frames/
