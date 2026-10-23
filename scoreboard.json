@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-23T06:23:16Z",
+ "generated_utc": "2026-10-23T06:33:44Z",
  "log_start_utc": "2026-10-19T00:00:00Z",
  "first_formal_read_utc": "2026-12-14T00:00:00Z",
  "pairs": [
@@ -263,7 +263,7 @@
   },
   "sh20": {
    "mean_diff": 0.01332834159900155,
-   "hac_t_lag24": 1.2660009854501628,
+   "hac_t_lag24": 1.2660009854501626,
    "n_hours": 96
   }
  },
@@ -272,7 +272,7 @@
   "model_mse_log": 0.1794298822591687,
   "baseline_mse_log": 0.1930352623271888,
   "mse_ratio": 0.9295186801416656,
-  "hac_t": 1.2660009854501628,
+  "hac_t": 1.2660009854501626,
   "hours": 96,
   "reading_if_read_now": "not enough hours yet"
  },
