@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-10-23T10:10:41Z",
+ "generated_utc": "2026-10-23T10:20:45Z",
  "log_start_utc": "2026-10-19T00:00:00Z",
  "first_formal_read_utc": "2026-12-14T00:00:00Z",
  "pairs": [
@@ -17,7 +17,7 @@
   "forecasts": true,
   "realized": true
  },
- "forecast_hours": 102,
+ "forecast_hours": 103,
  "late_hours": 0,
  "hours_without_receipt": 1,
  "status": "live",
@@ -278,6 +278,55 @@
  },
  "pass_rule": "PASS if, over scored hours 2026-10-19 00:00 .. 2026-12-13 23:00 UTC, the model's pooled MSE-log is lower than the best free baseline's and the pooled Diebold-Mariano HAC t (lag 24) > 1.96; FAIL if not lower; else INDETERMINATE (needs >= 600 scored hours)",
  "last_forecasts": [
+  {
+   "target_hour_utc": "2026-10-23T11:00:00Z",
+   "events": [],
+   "on_time": true,
+   "pairs": {
+    "EURUSD": {
+     "model": 10.845,
+     "atr": 9.29,
+     "sh20": 13.191,
+     "actual": null
+    },
+    "GBPUSD": {
+     "model": 12.486,
+     "atr": 9.295,
+     "sh20": 14.224,
+     "actual": null
+    },
+    "USDJPY": {
+     "model": 23.323,
+     "atr": 22.222,
+     "sh20": 17.932,
+     "actual": null
+    },
+    "USDCHF": {
+     "model": 10.851,
+     "atr": 9.368,
+     "sh20": 10.284,
+     "actual": null
+    },
+    "AUDUSD": {
+     "model": 7.504,
+     "atr": 7.635,
+     "sh20": 8.741,
+     "actual": null
+    },
+    "USDCAD": {
+     "model": 10.079,
+     "atr": 7.374,
+     "sh20": 13.297,
+     "actual": null
+    },
+    "NZDUSD": {
+     "model": 6.578,
+     "atr": 6.269,
+     "sh20": 7.617,
+     "actual": null
+    }
+   }
+  },
   {
    "target_hour_utc": "2026-10-23T10:00:00Z",
    "events": [],
@@ -1406,55 +1455,6 @@
      "atr": 8.108,
      "sh20": 11.661,
      "actual": 10.4
-    }
-   }
-  },
-  {
-   "target_hour_utc": "2026-10-22T11:00:00Z",
-   "events": [],
-   "on_time": true,
-   "pairs": {
-    "EURUSD": {
-     "model": 13.078,
-     "atr": 10.181,
-     "sh20": 12.674,
-     "actual": 23.2
-    },
-    "GBPUSD": {
-     "model": 16.373,
-     "atr": 10.941,
-     "sh20": 14.022,
-     "actual": 17.1
-    },
-    "USDJPY": {
-     "model": 25.471,
-     "atr": 19.064,
-     "sh20": 17.206,
-     "actual": 41.9
-    },
-    "USDCHF": {
-     "model": 13.008,
-     "atr": 9.885,
-     "sh20": 9.877,
-     "actual": 20.9
-    },
-    "AUDUSD": {
-     "model": 8.724,
-     "atr": 8.343,
-     "sh20": 8.467,
-     "actual": 15.4
-    },
-    "USDCAD": {
-     "model": 11.217,
-     "atr": 8.185,
-     "sh20": 13.1,
-     "actual": 12.8
-    },
-    "NZDUSD": {
-     "model": 7.824,
-     "atr": 8.093,
-     "sh20": 7.604,
-     "actual": 9.0
     }
    }
   }
