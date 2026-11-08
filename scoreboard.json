@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-11-08T21:24:40Z",
+ "generated_utc": "2026-11-08T22:20:30Z",
  "log_start_utc": "2026-10-19T00:00:00Z",
  "first_formal_read_utc": "2026-12-14T00:00:00Z",
  "pairs": [
@@ -17,7 +17,7 @@
   "forecasts": true,
   "realized": true
  },
- "forecast_hours": 353,
+ "forecast_hours": 354,
  "late_hours": 0,
  "hours_without_receipt": 1,
  "status": "live",
@@ -111,7 +111,7 @@
    },
    "sh20": {
     "mse_log": 0.23922431026100766,
-    "qlike": 0.6989498752808615,
+    "qlike": 0.6989498752808616,
     "mae_pips": 4.561520909772723,
     "hit25": 0.37822349570200575
    }
@@ -145,7 +145,7 @@
    "mean_range_pips": 18.81145893026931,
    "model": {
     "mse_log": 0.17787774380768817,
-    "qlike": 0.4754492011669704,
+    "qlike": 0.4754492011669703,
     "mae_pips": 6.252592432150431,
     "hit25": 0.47277936962750716
    },
@@ -190,7 +190,7 @@
    "hours": 348,
    "mean_range_pips": 9.362633936427528,
    "model": {
-    "mse_log": 0.17007175927778936,
+    "mse_log": 0.17007175927778934,
     "qlike": 0.4691196757881191,
     "mae_pips": 3.1052482707752875,
     "hit25": 0.4109195402298851
@@ -213,7 +213,7 @@
    "hours": 347,
    "mean_range_pips": 11.961483001839595,
    "model": {
-    "mse_log": 0.1512740694292455,
+    "mse_log": 0.15127406942924554,
     "qlike": 0.41566130837304005,
     "mae_pips": 3.5747132781266857,
     "hit25": 0.5244956772334294
@@ -263,7 +263,7 @@
   },
   "sh20": {
    "mean_diff": 0.05042111865617249,
-   "hac_t_lag24": 3.673316168277921,
+   "hac_t_lag24": 3.6733161682779216,
    "n_hours": 349
   }
  },
@@ -272,12 +272,61 @@
   "model_mse_log": 0.17546366847242062,
   "baseline_mse_log": 0.22612537723258816,
   "mse_ratio": 0.775957438390217,
-  "hac_t": 3.673316168277921,
+  "hac_t": 3.6733161682779216,
   "hours": 349,
   "reading_if_read_now": "not enough hours yet"
  },
  "pass_rule": "PASS if, over scored hours 2026-10-19 00:00 .. 2026-12-13 23:00 UTC, the model's pooled MSE-log is lower than the best free baseline's and the pooled Diebold-Mariano HAC t (lag 24) > 1.96; FAIL if not lower; else INDETERMINATE (needs >= 600 scored hours)",
  "last_forecasts": [
+  {
+   "target_hour_utc": "2026-11-08T23:00:00Z",
+   "events": [],
+   "on_time": true,
+   "pairs": {
+    "EURUSD": {
+     "model": 5.61,
+     "atr": 10.532,
+     "sh20": 10.215,
+     "actual": null
+    },
+    "GBPUSD": {
+     "model": 6.597,
+     "atr": 13.061,
+     "sh20": 10.736,
+     "actual": null
+    },
+    "USDJPY": {
+     "model": 16.082,
+     "atr": 18.6,
+     "sh20": 14.114,
+     "actual": null
+    },
+    "USDCHF": {
+     "model": 7.527,
+     "atr": 11.323,
+     "sh20": 9.446,
+     "actual": null
+    },
+    "AUDUSD": {
+     "model": 6.992,
+     "atr": 11.438,
+     "sh20": 6.61,
+     "actual": null
+    },
+    "USDCAD": {
+     "model": 7.48,
+     "atr": 13.265,
+     "sh20": 8.29,
+     "actual": null
+    },
+    "NZDUSD": {
+     "model": 6.33,
+     "atr": 7.718,
+     "sh20": 6.252,
+     "actual": null
+    }
+   }
+  },
   {
    "target_hour_utc": "2026-11-08T22:00:00Z",
    "events": [],
@@ -1406,55 +1455,6 @@
      "atr": 8.379,
      "sh20": 6.839,
      "actual": 6.0
-    }
-   }
-  },
-  {
-   "target_hour_utc": "2026-11-05T23:00:00Z",
-   "events": [],
-   "on_time": true,
-   "pairs": {
-    "EURUSD": {
-     "model": 6.183,
-     "atr": 12.242,
-     "sh20": 9.88,
-     "actual": 14.1
-    },
-    "GBPUSD": {
-     "model": 7.175,
-     "atr": 14.079,
-     "sh20": 10.419,
-     "actual": 16.3
-    },
-    "USDJPY": {
-     "model": 15.748,
-     "atr": 17.959,
-     "sh20": 12.674,
-     "actual": 44.0
-    },
-    "USDCHF": {
-     "model": 7.441,
-     "atr": 13.528,
-     "sh20": 8.888,
-     "actual": 17.7
-    },
-    "AUDUSD": {
-     "model": 6.963,
-     "atr": 10.791,
-     "sh20": 6.34,
-     "actual": 12.0
-    },
-    "USDCAD": {
-     "model": 7.768,
-     "atr": 12.028,
-     "sh20": 8.058,
-     "actual": 8.7
-    },
-    "NZDUSD": {
-     "model": 6.387,
-     "atr": 8.501,
-     "sh20": 6.297,
-     "actual": 7.7
     }
    }
   }
