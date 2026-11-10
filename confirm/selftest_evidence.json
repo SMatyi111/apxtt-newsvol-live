@@ -1,0 +1,65 @@
+{
+ "test": "pre-read self-test on already-seen data (CONFIRMATION_PREREG.md section 10)",
+ "harness": "confirm/replay_sealed.py",
+ "harness_sha256": "d814f8093fd3ea632f66cc1861a326f03eb6fe71f638a88431b615953aa40611",
+ "replayed": {
+  "target_hour_utc": "2026-10-07T14:00:00Z",
+  "now_utc": "2026-10-07T13:35:00Z"
+ },
+ "reference": {
+  "file": "log/warmup.jsonl",
+  "record_hash": "8899502778f6f8cc59b4d7494a8fe74d8a553f6469954a60adcfb622a299f2f6",
+  "fields": [
+   "target_hour_utc",
+   "asof_utc",
+   "coefficients_sha256",
+   "events_sha256",
+   "pairs",
+   "events",
+   "store_hour",
+   "inputs_until_utc",
+   "realized_check"
+  ],
+  "leaves_compared": 201,
+  "mismatches": []
+ },
+ "reference_2": {
+  "file": "log/warmup.jsonl",
+  "record_hash": "4356775e35654a1c9f809c7d17c79f10665022ca99046e7b07dbfbfef70e8272",
+  "fields": [
+   "target_hour_utc",
+   "asof_utc",
+   "coefficients_sha256",
+   "events_sha256",
+   "pairs",
+   "events",
+   "store_hour",
+   "inputs_until_utc"
+  ],
+  "leaves_compared": 138,
+  "mismatches": []
+ },
+ "exact_match": true,
+ "files_accessed": 728,
+ "latest_file_end_utc": "2026-10-07T15:00:00Z",
+ "any_file_overlaps_sealed_week": false,
+ "network_requests": 0,
+ "http_429": 0,
+ "seconds": 2.3,
+ "run_utc": "2026-11-10T22:51:56Z",
+ "frozen_sha256": {
+  "model/coefficients.csv": "21663b2aedcd6ecec87a6d13f482b4c4d87adb2ae261d1a9eb035a5c8d18ced4",
+  "model/events_utc.csv": "da1da082e25f011829ac4320144098b84dc82e891328ff31be8acef7bbb65e1b",
+  "PREREGISTRATION.md": "bffc98dff566d29f3211fb23bacc632d0a33f9e198cac5516b1a3fee49b6ffa4",
+  "newsvol/live.py": "5845e419dcc7454ebd9d94c1fb3f5257b0dfd35191017619bc852eb21617d9cb",
+  "newsvol/features.py": "44ed121ae8b93e92b460cc6053e7a62659011088c9540b2eb420ed93b0ff76e6",
+  "newsvol/model.py": "5931efdd4c29ebb719bf70d963148bedad86a45d559b13f2738d2c59bf4889d9",
+  "newsvol/events.py": "85b63e8e9d3eae8bfd23d46fd1ee437d1f0313da6eafd1067c2bc382c947e8c3",
+  "newsvol/metrics.py": "0368b928dd24d16244957a42ef954fe8c1059166769ff02dca8e9295ca6d17df",
+  "newsvol/dukascopy.py": "0c04cb73d28250437c18d757752d7546019f8d3a59e7b508989bc000b294f623",
+  "score.py": "2ca4536480d089db40b8ad4b58e8438d7fdd210520b46b46503d39340a059424"
+ },
+ "python": "3.12.10",
+ "numpy": "2.4.4",
+ "pandas": "2.3.3"
+}
