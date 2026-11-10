@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-11-10T11:41:15Z",
+ "generated_utc": "2026-11-10T11:45:24Z",
  "log_start_utc": "2026-10-19T00:00:00Z",
  "first_formal_read_utc": "2026-12-14T00:00:00Z",
  "pairs": [
@@ -258,7 +258,7 @@
  "dm_pooled_mse_log": {
   "atr": {
    "mean_diff": 0.0861938783664588,
-   "hac_t_lag24": 8.274397576160217,
+   "hac_t_lag24": 8.274397576160215,
    "n_hours": 385
   },
   "sh20": {
