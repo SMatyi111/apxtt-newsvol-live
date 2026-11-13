@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-11-13T18:24:26Z",
+ "generated_utc": "2026-11-13T18:45:24Z",
  "log_start_utc": "2026-10-19T00:00:00Z",
  "first_formal_read_utc": "2026-12-14T00:00:00Z",
  "pairs": [
@@ -258,12 +258,12 @@
  "dm_pooled_mse_log": {
   "atr": {
    "mean_diff": 0.09286829250194845,
-   "hac_t_lag24": 8.291474678927429,
+   "hac_t_lag24": 8.291474678927427,
    "n_hours": 463
   },
   "sh20": {
    "mean_diff": 0.037945911911335686,
-   "hac_t_lag24": 3.1794946093503196,
+   "hac_t_lag24": 3.179494609350319,
    "n_hours": 463
   }
  },
@@ -272,7 +272,7 @@
   "model_mse_log": 0.1747050847941712,
   "baseline_mse_log": 0.21307503944168757,
   "mse_ratio": 0.819922808659073,
-  "hac_t": 3.1794946093503196,
+  "hac_t": 3.179494609350319,
   "hours": 463,
   "reading_if_read_now": "not enough hours yet"
  },
