@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-11-26T17:25:14Z",
+ "generated_utc": "2026-11-26T17:45:35Z",
  "log_start_utc": "2026-10-19T00:00:00Z",
  "first_formal_read_utc": "2026-12-14T00:00:00Z",
  "pairs": [
@@ -17,7 +17,7 @@
   "forecasts": true,
   "realized": true
  },
- "forecast_hours": 679,
+ "forecast_hours": 680,
  "late_hours": 0,
  "hours_without_receipt": 1,
  "status": "live",
@@ -64,7 +64,7 @@
   },
   "sh20": {
    "mse_log": 0.4647791995526651,
-   "qlike": 2.8229919865105115,
+   "qlike": 2.822991986510511,
    "mae_pips": 9.851879513776709,
    "hit25": 0.3170731707317073
   }
@@ -105,7 +105,7 @@
    },
    "atr": {
     "mse_log": 0.29569948880205305,
-    "qlike": 0.8069074937815166,
+    "qlike": 0.8069074937815165,
     "mae_pips": 4.783080500359271,
     "hit25": 0.34077380952380953
    },
@@ -278,6 +278,55 @@
  },
  "pass_rule": "PASS if, over scored hours 2026-10-19 00:00 .. 2026-12-13 23:00 UTC, the model's pooled MSE-log is lower than the best free baseline's and the pooled Diebold-Mariano HAC t (lag 24) > 1.96; FAIL if not lower; else INDETERMINATE (needs >= 600 scored hours)",
  "last_forecasts": [
+  {
+   "target_hour_utc": "2026-11-26T18:00:00Z",
+   "events": [],
+   "on_time": true,
+   "pairs": {
+    "EURUSD": {
+     "model": 7.552,
+     "atr": 8.981,
+     "sh20": 9.983,
+     "actual": null
+    },
+    "GBPUSD": {
+     "model": 9.345,
+     "atr": 11.549,
+     "sh20": 11.222,
+     "actual": null
+    },
+    "USDJPY": {
+     "model": 8.428,
+     "atr": 10.738,
+     "sh20": 13.69,
+     "actual": null
+    },
+    "USDCHF": {
+     "model": 7.659,
+     "atr": 9.649,
+     "sh20": 7.918,
+     "actual": null
+    },
+    "AUDUSD": {
+     "model": 6.196,
+     "atr": 8.446,
+     "sh20": 7.947,
+     "actual": null
+    },
+    "USDCAD": {
+     "model": 9.487,
+     "atr": 10.163,
+     "sh20": 9.474,
+     "actual": null
+    },
+    "NZDUSD": {
+     "model": 4.998,
+     "atr": 6.239,
+     "sh20": 6.488,
+     "actual": null
+    }
+   }
+  },
   {
    "target_hour_utc": "2026-11-26T17:00:00Z",
    "events": [],
@@ -1402,55 +1451,6 @@
      "atr": 9.217,
      "sh20": 6.693,
      "actual": 6.5
-    }
-   }
-  },
-  {
-   "target_hour_utc": "2026-11-25T18:00:00Z",
-   "events": [],
-   "on_time": true,
-   "pairs": {
-    "EURUSD": {
-     "model": 13.712,
-     "atr": 11.914,
-     "sh20": 10.128,
-     "actual": 11.3
-    },
-    "GBPUSD": {
-     "model": 16.272,
-     "atr": 15.715,
-     "sh20": 11.401,
-     "actual": 14.4
-    },
-    "USDJPY": {
-     "model": 21.501,
-     "atr": 18.319,
-     "sh20": 13.186,
-     "actual": 24.3
-    },
-    "USDCHF": {
-     "model": 14.212,
-     "atr": 14.113,
-     "sh20": 7.638,
-     "actual": 15.2
-    },
-    "AUDUSD": {
-     "model": 11.633,
-     "atr": 12.994,
-     "sh20": 7.564,
-     "actual": 14.5
-    },
-    "USDCAD": {
-     "model": 16.154,
-     "atr": 15.354,
-     "sh20": 9.349,
-     "actual": 11.0
-    },
-    "NZDUSD": {
-     "model": 8.75,
-     "atr": 8.745,
-     "sh20": 6.468,
-     "actual": 8.9
     }
    }
   }
